@@ -1,14 +1,18 @@
 import re
 from dotenv import dotenv_values
 from requests import get
-from flask import Flask, render_template_string, redirect, url_for
+from flask import Flask, request, render_template, render_template_string, redirect, url_for
 
 app = Flask(__name__)
 STEAM_API_KEY = dotenv_values(".env")["STEAM_API_KEY"]
 
 @app.route("/")
+def index():
+    return render_template("index.html")
+
+@app.route("/api/getuid", methods=["POST"])
 def main():
-    username = ""
+    print("\n\n\nGIVEN USERNAME:", username := request.form["username"], "\n\n\n")
     data = get(f"https://steamcommunity.com/id/{username}/")
     
     try:
@@ -25,10 +29,10 @@ def main():
     finally:
         return render_template_string(data.text)
 
-@app.errorhandler(404)
-def handle_errors():
-    print("error detected.")
-    pass
+# @app.errorhandler(404)
+# def handle_errors():
+#     print("error detected.")
+#     pass
 
 if __name__ == "__main__":
     app.run(debug=True)
