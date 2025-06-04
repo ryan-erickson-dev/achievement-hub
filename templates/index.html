@@ -2,9 +2,10 @@
 <html>
     <head>
         <title>Achievement Hub</title>
+        <script src="static/app.js"></script>
     </head>
     <body>
-        <form id="submitUsername" action="/api/playerachievements", method="post">
+        <form id="submitUsername" onsubmit="submitUsername(event)">
             <input id="usernameInput" type="text" name="username"></input>
             <input type="submit"></input>
         </form>
