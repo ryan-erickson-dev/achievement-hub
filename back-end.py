@@ -14,13 +14,13 @@ def index():
 
 @app.route("/api/playerachievements", methods=["post"])
 def get_player_achievements():
-    username = request.form["username"]
+    username = request.get_json()["username"]
     print(username)
     if username not in USER_CACHE:
         print("user not in cache.\n")
         uid = get_uid_from_username(username)
         if uid == None:
-            return
+            return jsonify({ 'response' : 'error', 'status' : 'User does not exist.'})
         USER_CACHE[username] = { 
             "steam_id" : get_uid_from_username(username),
             "last_accessed": time.time()
@@ -34,7 +34,7 @@ def get_player_achievements():
     uid = USER_CACHE[username]["steam_id"]
     list = get(f"http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=440&key={STEAM_API_KEY}&steamid={uid}")
     print(list.text)
-    return "Hello"
+    return jsonify(list.text)
 
 def get_uid_from_username(username: str) -> str|None:
     try:
@@ -47,6 +47,9 @@ def get_uid_from_username(username: str) -> str|None:
         uid = re.findall(r"\"steamid\":\"(\d+)\"", data.text)[0]
     except exceptions.HTTPError as http_error:
         print("ERROR:", http_error)
+        return None
+    except IndexError as index_error:
+        print("ERROR:", index_error)
         return None
     else:
         return uid
